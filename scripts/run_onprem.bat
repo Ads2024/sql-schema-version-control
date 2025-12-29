@@ -3,6 +3,7 @@ REM ============================================================================
 REM Automated On-Prem SQL Objects Extraction and Versioning
 REM Created: November 6, 2025
 REM Author: Adam M
+REM Generalised: 2025-12-29
 REM Purpose: Extract on-prem SQL objects, commit changes and push to Github Origin Repo
 REM Usage: Schedule this batch file in windows Task Scheduler
 REM ======================================================================================================
@@ -36,10 +37,10 @@ IF ERRORLEVEL 1 (
 
 REM Run the on-prem extractor using local venv
 echo [%TIME%] Running on-prem extractor...>> "%LOG_FILE%"
-echo Command: %REPO_PATH%\venv\Scripts\python.exe %REPO_PATH%\code\versioner_onprem.py --all-servers --all-databases --include-sql-agent-jobs --type OnPrem --repo-root . -v >> "%LOG_FILE%"
+echo Command: %REPO_PATH%\venv\Scripts\python.exe -m versioner.cli --type onprem --config %REPO_PATH%\config.yaml --repo-root %REPO_PATH% --all-databases --include-sql-agent-jobs --verbose >> "%LOG_FILE%"
 echo. >> "%LOG_FILE%"
 
-"%REPO_PATH%\venv\Scripts\python.exe" "%REPO_PATH%\code\versioner_onprem.py" --all-servers --all-databases --include-sql-agent-jobs --type OnPrem --repo-root . -v >> "%LOG_FILE%" 2>&1
+"%REPO_PATH%\venv\Scripts\python.exe" -m versioner.cli --type onprem --config "%REPO_PATH%\config.yaml" --repo-root "%REPO_PATH%" --all-databases --include-sql-agent-jobs --verbose >> "%LOG_FILE%" 2>&1
 
 IF ERRORLEVEL 1 (
     echo [%TIME%] Failed to run on-prem extractor.>> 

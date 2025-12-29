@@ -1,0 +1,9 @@
+environments:
+  onprem:
+    servers:
+      - "sql-prod-01.corp.local"
+      - "sql-prod-02.corp.local"
+    extract_agent_jobs: true
+  fabric:
+    servers:
+      - "endpoint.fabric.microsoft.com"
