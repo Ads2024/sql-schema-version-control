@@ -1,16 +1,15 @@
 # sql-schema-version-control
 
 
-Production-grade database schema versioning system used to manage 40,000+ SQL objects across hybrid on-premises and Microsoft Fabric environments, generalised for this project.
+A utility for version controlling SQL objects across hybrid on-premises and Microsoft Fabric environments.
 
 ## Features
 
 - **Incremental extraction** - Timestamp-based delta tracking (only extracts changed objects)
 - **Hybrid cloud support** - Works with on-prem SQL Server (Windows Auth) and Microsoft Fabric (Service Principal)
 - **SQL Agent extraction** - Captures SQL Agent jobs, steps, and schedules (on-prem only)
-- **Atomic state management** - Corruption-resistant tracking via tempfile writes
-- **Multi-environment orchestration** - On-prem (Windows Task Scheduler) + Fabric (GitHub Actions)
-- **Scale proven** - Handles 40,000+ objects with 10-year retention history
+- **Atomic file operations** - Writes to temporary files and uses atomic replacement to ensure integrity
+- **Multi-environment orchestration** - Supports execution via Windows Task Scheduler (on-prem) and GitHub Actions (Fabric)
 
 ## Architecture
 ```
