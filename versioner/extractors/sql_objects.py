@@ -2,6 +2,7 @@
 import os
 import pyodbc
 from datetime import datetime, timezone
+from typing import Tuple
 from ..core.filesystem import sanitise_filename, write_if_changed, is_different
 from ..core.tracking import _parse_datetime_to_utc
 
@@ -24,7 +25,7 @@ def extract_sql_objects(
     include_header: bool = False,
     dry_run: bool = False,
     verbose: bool = False
-) -> tuple[int, int, datetime]:
+) -> Tuple[int, int, datetime]:
     """
     Extracts SQL objects (Views, Procedures) from the database.
     Returns (changed_count, skipped_count, max_modified_dt).

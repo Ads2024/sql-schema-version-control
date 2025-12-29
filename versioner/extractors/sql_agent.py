@@ -2,10 +2,12 @@
 import os
 import pyodbc
 from datetime import datetime, timezone
+from typing import Tuple
 from ..core.filesystem import sanitise_filename, write_if_changed, is_different
 from ..core.tracking import _parse_datetime_to_utc
 
 SOURCE_FOLDER = "src"
+
 
 def extract_sql_agent_jobs(
     conn: pyodbc.Connection,
@@ -15,7 +17,7 @@ def extract_sql_agent_jobs(
     last_run_dt: datetime,
     dry_run: bool = False,
     verbose: bool = False
-) -> tuple[int, int, datetime]:
+) -> Tuple[int, int, datetime]:
     """
     Extracts SQL Agent Jobs from msdb.
     Returns (changed_count, skipped_count, max_modified_dt).
