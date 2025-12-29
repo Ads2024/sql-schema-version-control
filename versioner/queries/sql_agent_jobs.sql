@@ -1,9 +1,4 @@
-/*
-Created: Nov 4, 2025
-By: Adam M.
-Generalised: 2025-12-29
-Objective: SQL Query to retrieve SQL Agent job details.
-*/
+
 SELECT
     j.job_id,
     j.name AS JobName,
