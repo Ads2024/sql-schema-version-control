@@ -1,12 +1,13 @@
 <#
-Created: Nov 4, 2025
+Created: Nov 6, 2025
 By: Adam M.
 Generalised: 2025-12-29
 Objective: PowerShell script to report extraction results to GitHub Issues.
 #>
 param (
     [string]$Type = "OnPrem",
-    [string]$Token
+    [string]$Token,
+    [string]$Assignee
 )
 
 $ErrorActionPreference = "Stop"
@@ -59,16 +60,31 @@ $Headers = @{
 }
 
 $Assignees = @()
-try {
-    # Get current user (token owner)
-    $UserResp = Invoke-RestMethod -Uri "https://api.github.com/user" -Method Get -Headers $Headers -ErrorAction SilentlyContinue
-    if ($UserResp -and $UserResp.login) {
-        $Assignees += $UserResp.login
-        Write-Host "Will assign issue to: $($UserResp.login)"
+
+# Check for override via Env Var or Argument
+if ($Assignee) {
+    $Assignees += $Assignee
+}
+elseif ($env:ISSUE_ASSIGNEE) {
+    $Assignees += $env:ISSUE_ASSIGNEE
+}
+
+# If no assignee specified, try to auto-assign to token owner
+if ($Assignees.Count -eq 0) {
+    try {
+        # Get current user (token owner)
+        $UserResp = Invoke-RestMethod -Uri "https://api.github.com/user" -Method Get -Headers $Headers -ErrorAction SilentlyContinue
+        if ($UserResp -and $UserResp.login) {
+            $Assignees += $UserResp.login
+            Write-Host "Will auto-assign issue to token owner: $($UserResp.login)"
+        }
+    }
+    catch {
+        Write-Warning "Could not determine GitHub user from token for assignment."
     }
 }
-catch {
-    Write-Warning "Could not determine GitHub user from token for assignment."
+else {
+    Write-Host "Will assign issue to: $($Assignees -join ', ')"
 }
 
 

@@ -1,0 +1,74 @@
+name: Fabric SQL Object Extraction
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  extract:
+    runs-on: windows-latest
+    
+    env:
+      FABRIC_SP_TENANT: ${{ secrets.FABRIC_TENANT_ID }}
+      FABRIC_SP_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+      FABRIC_SP_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+      SQL_CONN: ${{ secrets.FABRIC_ENDPOINT }} # Can serve as connection string or server name
+      ISSUE_ASSIGNEE: ${{ vars.ISSUE_ASSIGNEE }} # Use GitHub Variable for assignee
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Need full history for git diff in issue script
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install pyodbc azure-identity pyyaml
+          # Install ODBC Driver 18 if not available on runner (windows-latest usually has 17/18)
+
+      - name: Extract Fabric objects
+        run: |
+          # Uses env vars for auth and connection
+          # --server argument is optional if SQL_CONN env var is set, but better to be explicit if using secrets
+          # Assuming SQL_CONN is full connection string OR server name.
+          # If SQL_CONN is just server name, use --server.
+          # We'll use --server from the secret if it's just the endpoint.
+          
+          python -m versioner.cli --type fabric --all-databases --verbose
+      
+      - name: Commit and Push Changes
+        id: commit
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # Add changes
+          git add src/Fabric last_run.yaml
+          
+          # Check if there are changes
+          $status = git status --porcelain
+          if ($status) {
+            git commit -m "Automated Fabric extraction $(Get-Date -Format 'yyyy-MM-dd')"
+            git push
+            echo "changes_detected=true" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "changes_detected=false" >> $env:GITHUB_OUTPUT
+            Write-Host "No changes detected."
+          }
+
+      - name: Create GitHub Issue on Changes
+        if: steps.commit.outputs.changes_detected == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./scripts/create_github_issue.ps1 -Type "Fabric" -Token $env:GH_TOKEN
