@@ -264,16 +264,72 @@ sudo apt-get install msodbcsql18
 # Windows
 # Download from: https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server
 ```
+# Limitations & Requirements
 
+## Platform Requirements
+- **Operating System**: Windows (primary), Linux/macOS (untested)
+  - On-prem automation script (`scripts/run_onprem.bat`) is Windows-only
+  - Core Python modules should work cross-platform but not validated
+- **Cloud Provider**: Microsoft Azure/Fabric
+  - Authentication designed for Azure AD/Entra ID
+  - Connection patterns optimized for Fabric SQL endpoints
+- **Database**: Microsoft SQL Server 2012+
+  - Uses `sys.objects`, `sys.sql_modules`, `MSDB` system views
+  - Not compatible with PostgreSQL, MySQL, Oracle
+
+## Extraction Scope
+**Currently Extracts**:
+- Views (`sys.objects.type = 'V'`)
+- Stored Procedures (`sys.objects.type = 'P'`)
+- SQL Agent Jobs (from `MSDB`, on-prem only)
+
+**Does NOT Extract**:
+- Functions (scalar, inline table-valued, multi-statement)
+- Triggers (DDL, DML)
+- User-Defined Types
+- Table schemas (column definitions, constraints, indexes)
+- Security objects (logins, users, roles, permissions)
+- Server-level configuration
+
+**Rationale**: Focus on executable code that changes frequently. Table schemas 
+typically require migration tools (SSDT, Flyway, Liquibase) rather than simple 
+DDL extraction.
+
+## Authentication Support
+- **Azure/Fabric**: Service Principal (OAuth), Interactive (browser)
+- **On-Premise**: Windows Authentication (Integrated Security)
+- **Not Supported**: SQL Authentication (username/password)
+
+## Notification Requirements
+- GitHub Issues integration requires GitHub-hosted repository
+- Other Git providers (GitLab, Bitbucket, Azure DevOps) not supported for notifications
+- Tool functions without notifications if GitHub token not provided
+
+## Known Limitations
+- **Encrypted objects**: Cannot extract definitions of objects created WITH ENCRYPTION
+- **System databases**: Excludes master, model, msdb, tempdb by design
+- **Offline databases**: Skips databases where `state != 0`
+- **Large objects**: No size limit enforcement, but files >100MB may cause Git performance issues
+- **Concurrent runs**: No lock file protection; stagger schedules if running from multiple sources
+
+## Future Considerations
+- Cross-platform automation scripts (bash equivalents)
+- Extended object types (functions, triggers)
+- Table schema extraction
+- Support for other database platforms (PostgreSQL, MySQL)
+- GitLab/Azure DevOps notification integrations
+
+## Production Deployment
+Tested on:
+- Windows Server 2016+
+- MS Fabric (November 2025 to present)
+- GitHub Actions (ubuntu-latest, windows-latest)
+
+**Not Supported**:
+- Windows Server 2008 (non-R2) - Python 3.11 incompatible
+
+If deploying to other environments, validate thoroughly in non-production first.
 
 ## License
 
 MIT
-
-## Author
-
-Adam M. - Data Engineer
-
----
-
-**Questions?** Open an issue or reach out at `abdia980@gmail.com`
