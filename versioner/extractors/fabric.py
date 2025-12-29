@@ -3,6 +3,7 @@ import os
 import argparse
 from datetime import datetime, timezone
 import yaml
+import pyodbc
 from ..core.auth import AuthManager
 from ..core.connection import build_connection_string, replace_server_in_conn, replace_db_in_conn, list_databases
 from ..core.tracking import read_last_run, write_last_run
@@ -62,28 +63,45 @@ def run_fabric_extraction(args: argparse.Namespace, config: dict):
             print(f"\n{'='*60}\nProcessing server: {server}\n{'='*60}\n")
             
 
-        base_conn_str = args.conn or os.environ.get("SQL_CONN")
-        
+        # Driver Selection Logic
+        driver_to_use = args.driver
+        from ..core.connection import ensure_driver_available
+        if args.sp_fallback and not args.conn:
+             # Check if requested driver works, otherwise grab first available
+             try:
+                 ensure_driver_available(args.driver)
+             except RuntimeError:
+                 import pyodbc
+                 drivers = pyodbc.drivers()
+                 if drivers:
+                     driver_to_use = drivers[0]
+                     if verbose:
+                         print(f"WARN: Driver fallback enabled. Using installed driver: '{driver_to_use}'")
+
         if not base_conn_str:
              if args.ad_interactive:
-                 base_conn_str = build_connection_string(server=server, driver=args.driver, auth_interactive=True)
+                 base_conn_str = build_connection_string(server=server, driver=driver_to_use, auth_interactive=True)
              elif auth.has_sp_credentials():
                  base_conn_str = build_connection_string(
                      server=server, 
-                     driver=args.driver, 
+                     driver=driver_to_use, 
                      auth_sp=True, 
                      sp_legacy=args.sp_fallback,
                      sp_client_id=auth.client_id,
                      sp_client_secret=auth.client_secret
                  )
              else:
-                 base_conn_str = build_connection_string(server=server, driver=args.driver)
+                 base_conn_str = build_connection_string(server=server, driver=driver_to_use)
         
         # Ensure server name in conn string matches current loop
         server_conn_str = replace_server_in_conn(base_conn_str, server)
         
         # List Databases
         dbs = []
+        # Determine strict auth manager for listing: 
+        # If using legacy fallback, DO NOT pass auth token manager to list_databases (avoids token injection mixing)
+        list_db_auth = auth if (auth.has_sp_credentials() and not args.sp_fallback) else None
+        
         if args.databases_file:
              if os.path.exists(args.databases_file):
                  with open(args.databases_file, 'r') as f:
@@ -91,7 +109,7 @@ def run_fabric_extraction(args: argparse.Namespace, config: dict):
         elif args.databases:
             dbs = [d.strip() for d in args.databases.split(',') if d.strip()]
         elif args.all_databases:
-            dbs = list_databases(server_conn_str, auth_manager=auth, verbose=verbose)
+            dbs = list_databases(server_conn_str, auth_manager=list_db_auth, verbose=verbose)
         elif args.database:
             dbs = [args.database]
         else:
@@ -112,10 +130,8 @@ def run_fabric_extraction(args: argparse.Namespace, config: dict):
             
             if args.export_env:
                 os.environ["SQL_CONN"] = db_conn_str
-                pass
 
             # Connect
-            import pyodbc
             try:
                 connect_args = {"autocommit": True}
                 # Check if we should inject token
