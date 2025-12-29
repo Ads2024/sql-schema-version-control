@@ -1,9 +1,4 @@
-"""
-Created: Nov 4, 2025
-By: Adam M.
-Generalised: 2025-12-29
-Objective: Filesystem operations including atomic writes and sanitization.
-"""
+
 import os
 import re
 import hashlib

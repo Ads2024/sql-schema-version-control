@@ -1,9 +1,4 @@
-"""
-Created: Nov 4, 2025
-By: Adam M.
-Generalised: 2025-12-29
-Objective: Extraction logic for Microsoft Fabric/Azure SQL.
-"""
+
 import os
 import argparse
 from datetime import datetime, timezone

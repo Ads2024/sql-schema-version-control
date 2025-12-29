@@ -1,9 +1,4 @@
-"""
-Created: Nov 4, 2025
-By: Adam M.
-Generalised: 2025-12-29
-Objective: Main CLI entry point for the versioner.
-"""
+
 import argparse
 import sys
 import os

@@ -1,9 +1,4 @@
-"""
-Created: Nov 4, 2025
-By: Adam M.
-Generalised: 2025-12-29
-Objective: General utility functions (e.g. .env loading).
-"""
+
 import os
 
 def load_dotenv(path: str = ".env") -> None:

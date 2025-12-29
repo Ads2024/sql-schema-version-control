@@ -1,9 +1,4 @@
-<#
-Created: Nov 6, 2025
-By: Adam M.
-Generalised: 2025-12-29
-Objective: PowerShell script to report extraction results to GitHub Issues.
-#>
+
 param (
     [string]$Type = "OnPrem",
     [string]$Token,

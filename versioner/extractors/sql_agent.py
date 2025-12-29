@@ -1,9 +1,4 @@
-"""
-Created: Nov 4, 2025
-By: Adam M.
-Generalised: 2025-12-29
-Objective: Core logic for extracting SQL Agent Jobs.
-"""
+
 import os
 import pyodbc
 from datetime import datetime, timezone

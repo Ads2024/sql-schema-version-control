@@ -1,9 +1,4 @@
-"""
-Created: Nov 4, 2025
-By: Adam M.
-Generalised: 2025-12-29
-Objective: Extraction logic for On-Premise SQL Server.
-"""
+
 import os
 import argparse
 from datetime import datetime, timezone

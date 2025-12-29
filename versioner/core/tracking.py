@@ -1,9 +1,4 @@
-"""
-Created: Nov 4, 2025
-By: Adam M.
-Generalised: 2025-12-29
-Objective: Tracking of last execution times and datetime utilities.
-"""
+
 import os
 import yaml
 import tempfile

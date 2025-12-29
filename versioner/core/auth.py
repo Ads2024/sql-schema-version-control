@@ -1,9 +1,4 @@
-"""
-Created: Nov 4, 2025
-By: Adam M.
-Generalised: 2025-12-29
-Objective: Authentication management for Azure and Service Principals.
-"""
+
 import os
 import pyodbc
 from azure.identity import ClientSecretCredential
