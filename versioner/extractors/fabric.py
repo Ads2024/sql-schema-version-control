@@ -81,6 +81,13 @@ def run_fabric_extraction(args: argparse.Namespace, config: dict):
                      if verbose:
                          print(f"WARN: Driver fallback enabled. Using installed driver: '{driver_to_use}'")
 
+        # If SP fallback requested and no credentials found in conn string, rebuild
+        if args.sp_fallback and auth.has_sp_credentials() and base_conn_str:
+            if "UID=" not in base_conn_str.upper() and "AUTHENTICATION=" not in base_conn_str.upper():
+                 if verbose:
+                     print("DEBUG: SQL_CONN found but lacks credentials while --sp-fallback is requested. Rebuilding connection string with SP credentials.")
+                 base_conn_str = None # Force rebuild in the next block
+
         if not base_conn_str:
              if args.ad_interactive:
                  base_conn_str = build_connection_string(server=server, driver=driver_to_use, auth_interactive=True)
