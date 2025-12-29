@@ -63,6 +63,9 @@ def run_fabric_extraction(args: argparse.Namespace, config: dict):
             print(f"\n{'='*60}\nProcessing server: {server}\n{'='*60}\n")
             
 
+        # Initialize base connection string from args or env
+        base_conn_str = args.conn or os.environ.get("SQL_CONN")
+
         # Driver Selection Logic
         driver_to_use = args.driver
         from ..core.connection import ensure_driver_available
