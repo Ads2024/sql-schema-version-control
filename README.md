@@ -306,12 +306,6 @@ DDL extraction.
 - **Large objects**: No size limit enforcement, but files >100MB may cause Git performance issues
 - **Concurrent runs**: No lock file protection; stagger schedules if running from multiple sources
 
-## Future Considerations
-- Cross-platform automation scripts (bash equivalents)
-- Extended object types (functions, triggers)
-- Table schema extraction
-- Support for other database platforms (PostgreSQL, MySQL)
-- GitLab/Azure DevOps notification integrations
 
 ## Production Deployment
 Tested on:
