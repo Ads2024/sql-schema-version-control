@@ -94,38 +94,23 @@ Inject these as Environment Variables from GitHub Secrets. The workflow then pas
 
 ### Fabric Extraction
 ```bash
-# Extract from Fabric endpoint
-python -m versioner.cli \
-  --type fabric \
-  --server xyz.datawarehouse.fabric.microsoft.com \
-  --all-databases \
-  --verbose
+# Extract from Fabric endpoint (Using .env or Environment Variables for Auth)
+python -m versioner.cli --type fabric --server xyz.datawarehouse.fabric.microsoft.com --all-databases --verbose
+
+# Extract using explicit Service Principal arguments (overrides env)
+python -m versioner.cli --type fabric --server xyz.datawarehouse.fabric.microsoft.com --all-databases --sp-tenant <tenant_id> --sp-client-id <client_id> --sp-client-secret <secret> --sp-fallback --verbose
 
 # Dry run (preview changes without writing)
-python -m versioner.cli \
-  --type fabric \
-  --server xyz.datawarehouse.fabric.microsoft.com \
-  --database Lakehouse_Prod \
-  --dry-run
+python -m versioner.cli --type fabric --server xyz.datawarehouse.fabric.microsoft.com --database Lakehouse_Prod --dry-run
 ```
 
 ### On-Premises Extraction
 ```bash
 # Extract from multiple servers
-python -m versioner.cli \
-  --type onprem \
-  --servers sql-prod-01 sql-prod-02 \
-  --all-databases \
-  --include-sql-agent-jobs \
-  --verbose
+python -m versioner.cli --type onprem --servers sql-prod-01 sql-prod-02 --all-databases --include-sql-agent-jobs --verbose
 
 # Extract specific database
-python -m versioner.cli \
-  --type onprem \
-  --servers sql-analytics \
-  --database ReportingDB \
-  --include-drop \
-  --header
+python -m versioner.cli --type onprem --servers sql-analytics --database ReportingDB --include-drop --header
 ```
 
 ## How It Works
