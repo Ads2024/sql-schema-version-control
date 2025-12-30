@@ -57,28 +57,38 @@ pip install -r requirements.txt
 
 ## Configuration
 
-### config.yaml
+## Configuration
+
+### 1. Scope (`config.yaml`)
+Use `config.yaml` to define **what** to extract (Server lists, Environment flags). This file should be committed to the repo.
+
 ```yaml
 environments:
   onprem:
     servers:
-      - "sql-prod-01.corp.local"
-      - "sql-prod-02.corp.local"
+      - "sql-prod-01"
     extract_agent_jobs: true
     
   fabric:
     servers:
-      - "abc123.datawarehouse.fabric.microsoft.com"
+      - "xyz.datawarehouse.fabric.microsoft.com"
 ```
 
-### Environment Variables
+### 2. Authentication (Secrets)
+**NEVER** commit secrets to `config.yaml`. Use Environment Variables or CLI arguments.
 
-For Fabric (Service Principal):
-```bash
-export FABRIC_TENANT_ID="your-tenant-id"
-export FABRIC_CLIENT_ID="your-client-id"
-export FABRIC_CLIENT_SECRET="your-secret"
+**Local Development (`.env`):**
+Create a `.env` file in the root directory to store secrets locally. The tool automatically loads this file.
+```properties
+FABRIC_SP_TENANT=00000000-0000...
+FABRIC_SP_CLIENT_ID=00000000-0000...
+FABRIC_SP_CLIENT_SECRET=your-secret...
+# Optional: Default connection string
+SQL_CONN="DRIVER={ODBC Driver 17 for SQL Server};SERVER=...;..."
 ```
+
+**CI/CD (GitHub Actions):**
+Inject these as Environment Variables from GitHub Secrets. The workflow then passes them as arguments or relies on the process environment.
 
 ## Usage
 

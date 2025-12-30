@@ -74,7 +74,6 @@ def run_fabric_extraction(args: argparse.Namespace, config: dict):
              try:
                  ensure_driver_available(args.driver)
              except RuntimeError:
-                 import pyodbc
                  drivers = pyodbc.drivers()
                  if drivers:
                      driver_to_use = drivers[0]

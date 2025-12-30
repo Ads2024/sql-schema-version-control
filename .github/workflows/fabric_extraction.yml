@@ -44,7 +44,7 @@ jobs:
           # If SQL_CONN is just server name, use --server.
           # We'll use --server from the secret if it's just the endpoint.
           
-          python -m versioner.cli --type fabric --all-databases --verbose
+          python -m versioner.cli --type fabric --sp-tenant $env:FABRIC_SP_TENANT --sp-client-id $env:FABRIC_SP_CLIENT_ID --sp-client-secret $env:FABRIC_SP_CLIENT_SECRET --all-databases  --repo-root . --driver "ODBC Driver 17 for SQL Server" --sp-fallback -v
       
       - name: Commit and Push Changes
         id: commit
